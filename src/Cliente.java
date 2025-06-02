@@ -17,8 +17,8 @@ public class Cliente {
         this.httpClient = HttpClient.newHttpClient();
     }
 
-    public double obtenerTasaCambio(String monedaBase, String monedaObjetivo) throws IOException, InterruptedException {
-        String url = BASE_URL + API_KEY + "/pair/" + monedaBase + "/" + monedaObjetivo;
+    public String  obtenerTasaCambio(String monedaBase) throws IOException, InterruptedException {
+        String url = BASE_URL + API_KEY + "/latest/" + monedaBase;
 
         //Paso 5
         HttpRequest request = HttpRequest.newBuilder()
@@ -29,10 +29,6 @@ public class Cliente {
         //Paso 6
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        //paso 7 Json
-        Gson gson = new Gson();
-        RespuestaTasaCambio datos = gson.fromJson(response.body(), RespuestaTasaCambio.class);
-
-        return datos.getConversion_rate();
+        return response.body();
     }
 }
