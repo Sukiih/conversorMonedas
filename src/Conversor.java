@@ -1,3 +1,6 @@
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.Map;
 import java.util.Scanner;
 
@@ -17,7 +20,6 @@ public class Conversor {
         Scanner scanner = new Scanner(System.in);
         String monedaBase;
         String monedaDestino;
-        double cantidad;
 
         while (true) {
             System.out.println("\n👋 Bienvenido/a al Conversor de Moneda");
@@ -38,23 +40,44 @@ public class Conversor {
                         System.out.print("Ingrese la moneda destino (ej: EUR): ");
                         monedaDestino = scanner.nextLine().toUpperCase();
 
-                        System.out.print("Ingrese la cantidad a convertir: ");
-                        cantidad = Double.parseDouble(scanner.nextLine());
+                        //ADD un while para que el usuario no sea arrojado fuera del sistema al equivocarse
+                        double cantidad;
+                        while (true) {
+                            System.out.print("Ingrese la cantidad a convertir: ");
+                            try {
+                                cantidad = Double.parseDouble(scanner.nextLine());
+                                if (cantidad <= 0) {
+                                    System.out.println("❌ La cantidad debe ser mayor que cero. Inténtalo nuevamente.");
+                                } else {
+                                    break;
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("❌ Entrada no válida. Ingresa un número.");
+                            }
+                        }
 
                         String respuesta = cliente.obtenerTasaCambio(monedaBase);
+
+                        // Validar si la respuesta fue exitosa
+                        JsonObject json = JsonParser.parseString(respuesta).getAsJsonObject();
+                        if (!json.get("result").getAsString().equals("success")) {
+                            System.out.println("❌ Moneda base no válida: '" + monedaBase + "'. Intenta con un código como USD, EUR, CLP, etc.");
+                            break;
+                        }
+
                         Map<String, Double> tasas = filtro.filtrarMonedas(respuesta);
 
                         if (!tasas.containsKey(monedaDestino)) {
-                            System.out.println("❌ Moneda destino no válida.");
+                            System.out.println("❌ Moneda destino no válida: '" + monedaDestino + "'. Intenta con un código como USD, EUR, CLP, etc.");
                             break;
                         }
 
                         double tasa = tasas.get(monedaDestino);
                         double resultado = conversor.convertir(cantidad, tasa);
 
-                        System.out.printf("Resultado: %.2f %s = %.2f %s%n", cantidad, monedaBase.toUpperCase(), resultado, monedaDestino.toUpperCase());
+                        System.out.printf("✅ Resultado: %.2f %s = %.2f %s%n", cantidad, monedaBase, resultado, monedaDestino);
                     } catch (Exception e) {
-                        System.out.println("❌ Error: " + e.getMessage());
+                        System.out.println("❌ Error inesperado: " + e.getMessage());
                     }
                     break;
 
@@ -64,14 +87,23 @@ public class Conversor {
                         monedaBase = scanner.nextLine().toUpperCase();
 
                         String respuesta = cliente.obtenerTasaCambio(monedaBase);
+
+                        //verificar + msj claro al usuario
+                        JsonObject json = JsonParser.parseString(respuesta).getAsJsonObject();
+                        if (!json.get("result").getAsString().equals("success")) {
+                            System.out.println("❌ Moneda base no válida: '" + monedaBase + "'. Intenta con un código como USD, EUR, CLP, etc.");
+                            break;
+                        }
+
                         Map<String, Double> tasas = filtro.filtrarMonedas(respuesta);
 
-                        System.out.println("Tasas de cambio para " + monedaBase + ":");
+                        System.out.println("📊 Tasas de cambio para " + monedaBase + ":");
                         tasas.forEach((moneda, tasa) -> System.out.println(moneda + " : " + tasa));
                     } catch (Exception e) {
-                        System.out.println("❌ Error: " + e.getMessage());
+                        System.out.println("❌ Error inesperado: " + e.getMessage());
                     }
                     break;
+
 
                 case "3":
                     System.out.println("👋 ¡Hasta luego!");
