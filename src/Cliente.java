@@ -3,7 +3,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import com.google.gson.Gson;
 
 public class Cliente {
 
@@ -17,7 +16,7 @@ public class Cliente {
         this.httpClient = HttpClient.newHttpClient();
     }
 
-    public String  obtenerTasaCambio(String monedaBase) throws IOException, InterruptedException {
+    public String obtenerTasaCambio(String monedaBase) throws IOException, InterruptedException {
         String url = BASE_URL + API_KEY + "/latest/" + monedaBase;
 
         //Paso 5
