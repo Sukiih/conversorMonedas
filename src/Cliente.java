@@ -3,6 +3,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import com.google.gson.Gson;
 
 public class Cliente {
 
@@ -11,20 +12,27 @@ public class Cliente {
 
     private final HttpClient httpClient;
 
+    //paso 4
     public Cliente() {
         this.httpClient = HttpClient.newHttpClient();
     }
 
-    public String obtenerTasaCambio(String monedaBase, String monedaObjetivo) throws IOException, InterruptedException {
+    public double obtenerTasaCambio(String monedaBase, String monedaObjetivo) throws IOException, InterruptedException {
         String url = BASE_URL + API_KEY + "/pair/" + monedaBase + "/" + monedaObjetivo;
 
+        //Paso 5
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
                 .build();
 
+        //Paso 6
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return response.body();
+        //paso 7 Json
+        Gson gson = new Gson();
+        RespuestaTasaCambio datos = gson.fromJson(response.body(), RespuestaTasaCambio.class);
+
+        return datos.getConversion_rate();
     }
 }
