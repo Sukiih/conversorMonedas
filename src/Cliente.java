@@ -6,7 +6,7 @@ import java.net.http.HttpResponse;
 
 public class Cliente {
 
-    private static final String API_KEY = "547b7f3ac97d42561c4b800b";
+    private static final String API_KEY = Config.obtenerApiKey();
     private static final String BASE_URL = "https://v6.exchangerate-api.com/v6/";
 
     private final HttpClient httpClient;

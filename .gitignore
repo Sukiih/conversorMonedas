@@ -27,3 +27,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Configuración local (API keys, variables sensibles)
+config.properties
